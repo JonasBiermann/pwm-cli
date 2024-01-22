@@ -1,13 +1,37 @@
-const chalk = require("chalk");
+#! /usr/bin/env node
+
 const yargs = require("yargs");
-const boxen = require("boxen");
+const fs = require("fs");
 
+const inputFile = "input.txt"; // File to store the input value
 
-const usage = chalk.keyword('violet')("\nUsage: mycli -l <language>  -s <sentence> \n"
-  + boxen(chalk.green("\n" + "Translates a sentence to a specific language" + "\n"), { padding: 1, borderColor: 'green', dimBorder: true }) + "\n");
-const options = yargs
-  .usage(usage)
-  .option("l", { alias: "language", describe: "Translate to language", type: "string", demandOption: false })
-  .option("s", { alias: "sentence", describe: "Sentence to be translated", type: "string", demandOption: false })
-  .help(true)
-  .argv;
+yargs
+  .command({
+    command: "input",
+    describe: "Set input",
+    builder: {
+      input: {
+        describe: "Input value",
+        demandOption: true,
+        type: "string",
+      },
+    },
+    handler: function (argv) {
+      const input = argv.input;
+      console.log("Setting input:", input);
+      fs.writeFileSync(inputFile, input);
+    },
+  })
+  .command({
+    command: "output",
+    describe: "Get output",
+    handler: function () {
+      try {
+        const input = fs.readFileSync(inputFile, "utf-8");
+        console.log("Output:", input);
+      } catch (error) {
+        console.error("Error reading input:", error.message);
+      }
+    },
+  })
+  .help().argv;

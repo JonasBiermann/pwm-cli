@@ -1,30 +1,21 @@
 {
-  "name": "pwm",
+  "name": "mycli",
   "version": "1.0.0",
-  "description": "CLI tool for managing passwords secured by computer vision and face recognition",
-  "main": "./bin/index.js",
-  "scripts": {
-    "test": "pwm test"
+  "description": "A simple CLI",
+  "main": "index.js",
+  "bin": {
+    "mycli": "./index.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/JonasBiermann/pwm-cli.git"
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
     "cli",
-    "password-manager"
+    "simple"
   ],
-  "author": "Jonas Jacob Biermann",
-  "license": "UNLICENSED",
-  "bugs": {
-    "url": "https://github.com/JonasBiermann/pwm-cli/issues"
-  },
-  "homepage": "https://github.com/JonasBiermann/pwm-cli#readme",
-  "bin": {
-    "pwm": "./bin/index.js"
-  },  
+  "author": "Your Name",
+  "license": "MIT",
   "dependencies": {
-    "chalk": "^5.3.0",
     "yargs": "^17.7.2"
   }
 }
