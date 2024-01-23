@@ -34,4 +34,41 @@ yargs
       }
     },
   })
+  .command({
+    command: "add-password",
+    describe: "Add a new password",
+    builder: {
+      website: {
+        describe: "Website URL",
+        demandOption: true,
+        type: "string",
+      },
+      username: {
+        describe: "Username",
+        demandOption: true,
+        type: "string",
+      },
+      password: {
+        describe: "Password",
+        demandOption: true,
+        type: "string",
+      },
+      star: {
+        describe: "Star Password?",
+        demandOption: false,
+        type: "string",
+      }
+    },
+    handler: function(argv) {
+      try {
+        console.log("Success?")
+        console.log(argv)
+        const input = argv.input;
+        console.log("Setting input:", input);
+      fs.writeFileSync(inputFile, input);
+      } catch (error) {
+        console.error("Error:", error.message)
+      }
+    }
+  })
   .help().argv;

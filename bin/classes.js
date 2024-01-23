@@ -36,10 +36,11 @@ class Password {
 }
 
 class User {
-  constructor(username, password, face_data) {
+  constructor(username, password, face_data, is_logged_in) {
     this.username = username;
     this.password = password;
     this.face_data = face_data;
+    this.is_logged_in = is_logged_in;
   }
 
   authenticateUser(entered_password) {
@@ -64,3 +65,13 @@ class User {
     return true;
   }
 }
+
+function create_password(website, username, password, starred) {
+  entry = new Password(website, username, password, starred);
+  return entry;
+};
+
+function create_user(username, password, face_data) {
+  entry = new User(username, password, face_data, true);
+  return entry;
+};
