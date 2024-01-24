@@ -66,12 +66,23 @@ class User {
   }
 }
 
-function create_password(website, username, password, starred) {
-  entry = new Password(website, username, password, starred);
+export function create_password(website, username, password, starred) {
+  let entry = new Password(website, username, password, starred);
   return entry;
-};
+}
 
-function create_user(username, password, face_data) {
-  entry = new User(username, password, face_data, true);
+export function create_user(username, password, face_data) {
+  let entry = new User(username, password, face_data, true);
   return entry;
-};
+}
+
+export function generate_password(length) {
+  const charset =
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+[]{}|;:',.<>/?.,";
+  let password = "";
+  for (let i = 0; i < length; i++) {
+    const random_index = Math.floor(Math.random() * charset.length);
+    password += charset.charAt(random_index);
+  }
+  return password;
+}
