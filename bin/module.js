@@ -36,11 +36,11 @@ class Password {
 }
 
 class User {
-  constructor(username, password, face_data, is_logged_in) {
+  constructor(username, password, face_data, session) {
     this.username = username;
     this.password = password;
     this.face_data = face_data;
-    this.is_logged_in = is_logged_in;
+    this.session = session;
   }
 
   authenticateUser(entered_password) {
@@ -56,12 +56,19 @@ class User {
     if (entered_password === this.password) {
       return true;
     } else {
-      throw new Error("Entered password doesn't match user password");
+      console.log("Entered Password doesn't match user password!");
+      return false;
+      // throw new Error("Entered password doesn't match user password");
     }
   }
 
   checkFaceData() {
     // run python script for face recognition with this.face_data
+    return true;
+  }
+
+  logOutUser() {
+    this.session = false;
     return true;
   }
 }
