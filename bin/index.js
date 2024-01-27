@@ -15,8 +15,8 @@ yargs(hideBin(process.argv))
   .command({
     command: "logout",
     describe: "Logout User",
-    handler: function() {
-      let user = create_user("JonasBiermann", "1234", "")
+    handler: function () {
+      let user = create_user("JonasBiermann", "1234", "");
       try {
         if (user.logOutUser()) {
           console.log("Sucessfully logged out!");
@@ -26,12 +26,12 @@ yargs(hideBin(process.argv))
       } catch (e) {
         console.error("Error reading input: ", e.message);
       }
-    }
+    },
   })
   .command({
     command: "create-user",
     describe: "Create User",
-    handler: function() {
+    handler: function () {
       try {
         const rl = readline.createInterface({
           input: process.stdin,
@@ -43,17 +43,17 @@ yargs(hideBin(process.argv))
             let user = create_user(username, password, "");
             console.log(user);
             rl.close();
-          })
-        })
+          });
+        });
       } catch (e) {
         console.error("Error reading input: ", e.message);
       }
-    }
+    },
   })
   .command({
     command: "authenticate",
     describe: "Authenticate User",
-    handler: function() {
+    handler: function () {
       try {
         const rl = readline.createInterface({
           input: process.stdin,
@@ -63,14 +63,14 @@ yargs(hideBin(process.argv))
         rl.question("Enter your Password: ", (password) => {
           if (user.checkPassword(password)) {
             user.session = false;
-            console.log(user)
+            console.log(user);
           }
           rl.close();
-        })
+        });
       } catch (e) {
         console.error("Error reading input: ", error.message);
       }
-    }
+    },
   })
   .command({
     command: "input",
@@ -153,8 +153,8 @@ yargs(hideBin(process.argv))
 
           console.log(secure_password);
           rl.question("Do you want to save this password? (y/n): ", (save) => {
-            if (save === 'y'){
-              rl.question("Website: ", (website) =>  {
+            if (save === "y") {
+              rl.question("Website: ", (website) => {
                 rl.question("Username: ", (username) => {
                   rl.question("Starred (y/n): ", (starred) => {
                     // Create password object
@@ -169,13 +169,13 @@ yargs(hideBin(process.argv))
                     console.log("New Password:", newPassword);
 
                     rl.close();
-                  })
-                })
-              })
+                  });
+                });
+              });
             } else {
               rl.close();
             }
-          })
+          });
         });
       } catch (e) {
         console.log("Error:", e.message);

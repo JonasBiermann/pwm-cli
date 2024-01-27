@@ -16,6 +16,7 @@
   "author": "Your Name",
   "license": "MIT",
   "dependencies": {
+    "crypto": "^1.0.1",
     "yargs": "^17.7.2"
   }
 }
