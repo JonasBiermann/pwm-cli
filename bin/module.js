@@ -39,11 +39,12 @@ class Password {
 }
 
 class User {
-  constructor(username, password, face_data, session) {
+  constructor(username, password, face_data, session, user_key) {
     this.username = username;
     this.password = password;
     this.face_data = face_data;
     this.session = session;
+    this.user_key = user_key;
   }
 
   authenticateUser(entered_password) {
@@ -76,7 +77,7 @@ class User {
   }
 }
 
-class Storage {
+export class Storage {
   constructor(file_path, encryption_key) {
     this.file_path = file_path;
     this.encryption_key = Buffer.from(encryption_key, "hex");
@@ -191,8 +192,8 @@ export function create_password(website, username, password, starred) {
   return entry;
 }
 
-export function create_user(username, password, face_data) {
-  let entry = new User(username, password, face_data, true);
+export function create_user(username, password, face_data, user_key) {
+  let entry = new User(username, password, face_data, true, user_key);
   return entry;
 }
 

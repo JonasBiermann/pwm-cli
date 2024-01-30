@@ -1,6 +1,6 @@
 #! /usr/bin/env node
 
-import { create_password, create_user, generate_password } from "./module.js";
+import { create_password, create_user, generate_password, Storage} from "./module.js";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import readline from "readline";
@@ -40,7 +40,8 @@ yargs(hideBin(process.argv))
 
         rl.question("Username: ", (username) => {
           rl.question("Password: ", (password) => {
-            let user = create_user(username, password, "");
+            let user_key = crypto.randomBytes(32).toString("hex");
+            let user = create_user(username, password, "", user_key);
             console.log(user);
             rl.close();
           });
@@ -115,7 +116,7 @@ yargs(hideBin(process.argv))
             rl.question("Password: ", (password) => {
               rl.question("Starred (y/n): ", (starred) => {
                 // Create password object
-                const newPassword = create_password(
+                const new_password = create_password(
                   website,
                   username,
                   password,
@@ -123,7 +124,9 @@ yargs(hideBin(process.argv))
                 );
 
                 // Do something with the new password object (e.g., save it)
-                console.log("New Password:", newPassword);
+                let user_password_data = new Storage("userData.json", user.user_key);
+                console.log("New Password:", new_password);
+                user_password_data.savePassword(new_password);
 
                 // Close the readline interface
                 rl.close();
@@ -158,7 +161,7 @@ yargs(hideBin(process.argv))
                 rl.question("Username: ", (username) => {
                   rl.question("Starred (y/n): ", (starred) => {
                     // Create password object
-                    const newPassword = create_password(
+                    const new_password = create_password(
                       website,
                       username,
                       secure_password,
@@ -166,8 +169,9 @@ yargs(hideBin(process.argv))
                     );
 
                     // Do something with the new password object (e.g., save it)
-                    console.log("New Password:", newPassword);
-
+                    let user_password_data = new Storage("userData.json", user.user_key);
+                    console.log("New Password:", new_password);
+                    user_password_data.savePassword(new_password);
                     rl.close();
                   });
                 });
