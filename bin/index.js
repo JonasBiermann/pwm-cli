@@ -11,9 +11,6 @@ import { User } from "./classes/UserClass.js";
 // Function to check if user is authenticated
 function isAuthenticated() {
   const user = UserSingleton.getInstance().getUser();
-  console.log(user instanceof User); // Should return false
-  console.log(user instanceof UserSingleton); // Should return true
-  console.log(typeof user);
   console.log(user);
   return user && user.getSession();
 }
@@ -23,29 +20,35 @@ yargs(hideBin(process.argv))
     command: "create-user",
     describe: "Create User",
     handler: async function () {
-      try {
-        const rl = readline.createInterface({
-          input: process.stdin,
-          output: process.stdout,
-        });
-
-        rl.question("Username: ", (username) => {
-          rl.question("Password: ", (password) => {
-            let user_key = crypto.randomBytes(32).toString("hex");
-
-            // Use the singleton instance to create the user
-            UserSingleton.getInstance().createUser(
-              username,
-              password,
-              "",
-              user_key
-            );
-            console.log("User created successfully.");
-            rl.close();
+      const user = UserSingleton.getInstance();
+      if (!user){
+        try {
+          const rl = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout,
           });
-        });
-      } catch (e) {
-        console.error("Error creating user: ", e.message);
+  
+          rl.question("Username: ", (username) => {
+            rl.question("Password: ", (password) => {
+              let user_key = crypto.randomBytes(32).toString("hex");
+  
+              // Use the singleton instance to create the user
+              UserSingleton.getInstance().createUser(
+                username,
+                password,
+                "",
+                user_key
+              );
+              console.log("User created successfully.");
+              rl.close();
+            });
+          });
+        } catch (e) {
+          console.error("Error creating user: ", e.message);
+        }
+      }
+      else {
+        console.log("user already exists!")
       }
     },
   })
@@ -71,23 +74,28 @@ yargs(hideBin(process.argv))
     command: "authenticate",
     describe: "Authenticate User",
     handler: function () {
-      try {
-        const rl = readline.createInterface({
-          input: process.stdin,
-          output: process.stdout,
-        });
-        rl.question("Enter your Password: ", (password) => {
-          const user = GlobalUser.getUser();
-          if (user && user.authenticateUser(password)) {
-            user.session = true;
-            console.log("User authenticated successfully.");
-          } else {
-            console.log("Authentication failed. User not found.");
-          }
-          rl.close();
-        });
-      } catch (e) {
-        console.error("Error reading input: ", error.message);
+      if (!isAuthenticated) {
+        try {
+          const rl = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout,
+          });
+          rl.question("Enter your Password: ", (password) => {
+            const user = GlobalUser.getUser();
+            if (user && user.authenticateUser(password)) {
+              user.session = true;
+              console.log("User authenticated successfully.");
+            } else {
+              console.log("Authentication failed. User not found.");
+            }
+            rl.close();
+          });
+        } catch (e) {
+          console.error("Error reading input: ", error.message);
+        }
+      }
+      else {
+        console.log("User is already authenticated");
       }
     },
   })

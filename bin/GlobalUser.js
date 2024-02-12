@@ -78,7 +78,7 @@ class UserSingleton {
     return this.user.session;
   }
 
-  logOutUser(user) {
+  logOutUser() {
     this.user.session = false;
     this.writeUserDataToFile();
   }
