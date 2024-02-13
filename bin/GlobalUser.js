@@ -59,12 +59,15 @@ class UserSingleton {
     try {
       const userData = fs.readFileSync(USER_FILE_PATH, "utf-8");
       const userDataObject = JSON.parse(userData);
-      return new User(
-        userDataObject.username,
-        userDataObject.password,
-        userDataObject.face_data,
-        userDataObject.user_key
-      );
+      if (userDataObject) {
+        return new User(
+          userDataObject.username,
+          userDataObject.password,
+          userDataObject.face_data,
+          userDataObject.user_key
+        );
+      return null; 
+      }
     } catch (error) {
       console.error("Error reading user data from file:", error.message);
       return null;
@@ -80,6 +83,11 @@ class UserSingleton {
 
   logOutUser() {
     this.user.session = false;
+    this.writeUserDataToFile();
+  }
+
+  delete() {
+    this.user = null;
     this.writeUserDataToFile();
   }
 }

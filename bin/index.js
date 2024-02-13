@@ -11,7 +11,6 @@ import { User } from "./classes/UserClass.js";
 // Function to check if user is authenticated
 function isAuthenticated() {
   const user = UserSingleton.getInstance().getUser();
-  console.log(user);
   return user && user.getSession();
 }
 
@@ -20,7 +19,7 @@ yargs(hideBin(process.argv))
     command: "create-user",
     describe: "Create User",
     handler: async function () {
-      const user = UserSingleton.getInstance();
+      const user = UserSingleton.getInstance().getUser();
       if (!user){
         try {
           const rl = readline.createInterface({
@@ -95,7 +94,11 @@ yargs(hideBin(process.argv))
         }
       }
       else {
-        console.log("User is already authenticated");
+        if (UserSingleton.getInstance().getUser()){
+          console.log("User is already authenticated");
+        } else {
+          console.log("User doesn't exist!")
+        }
       }
     },
   })
@@ -104,7 +107,11 @@ yargs(hideBin(process.argv))
     describe: "Add a new password",
     handler: async function () {
       if (!isAuthenticated()) {
-        console.log("User not authenticated");
+        if (UserSingleton.getInstance().getUser()) {
+          console.log("User not authenticated");
+        } else {
+          console.log("User doesn't exist!")
+        }
         return;
       } else {
         try {
@@ -150,7 +157,11 @@ yargs(hideBin(process.argv))
     describe: "Generates a secure password",
     handler: function (argv) {
       if (!isAuthenticated()) {
-        console.log("User not authenticated");
+        if (UserSingleton.getInstance().getUser()) {
+          console.log("User not authenticated");
+        } else {
+          console.log("User doesnt't exist!");
+        }
         return;
       } else {
         try {
@@ -202,5 +213,24 @@ yargs(hideBin(process.argv))
         }
       }
     },
+  })
+  .command({
+    command: "status",
+    description: "Check the User status",
+    handler: function() {
+      const user = UserSingleton.getInstance().getUser();
+      if (!user) {
+        console.log("User doenst exist!");
+      } else {
+        console.log(user);
+    }}
+  })
+  .command({
+    command: "delete-user",
+    description: "Delete the current User and all Passwords",
+    handler: function() {
+      UserSingleton.getInstance().delete();
+      console.log("Success!")
+    }
   })
   .parse();
