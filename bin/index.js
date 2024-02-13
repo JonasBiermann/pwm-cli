@@ -20,17 +20,17 @@ yargs(hideBin(process.argv))
     describe: "Create User",
     handler: async function () {
       const user = UserSingleton.getInstance().getUser();
-      if (!user){
+      if (!user) {
         try {
           const rl = readline.createInterface({
             input: process.stdin,
             output: process.stdout,
           });
-  
+
           rl.question("Username: ", (username) => {
             rl.question("Password: ", (password) => {
               let user_key = crypto.randomBytes(32).toString("hex");
-  
+
               // Use the singleton instance to create the user
               UserSingleton.getInstance().createUser(
                 username,
@@ -45,9 +45,8 @@ yargs(hideBin(process.argv))
         } catch (e) {
           console.error("Error creating user: ", e.message);
         }
-      }
-      else {
-        console.log("user already exists!")
+      } else {
+        console.log("user already exists!");
       }
     },
   })
@@ -92,12 +91,11 @@ yargs(hideBin(process.argv))
         } catch (e) {
           console.error("Error reading input: ", error.message);
         }
-      }
-      else {
-        if (UserSingleton.getInstance().getUser()){
+      } else {
+        if (UserSingleton.getInstance().getUser()) {
           console.log("User is already authenticated");
         } else {
-          console.log("User doesn't exist!")
+          console.log("User doesn't exist!");
         }
       }
     },
@@ -110,7 +108,7 @@ yargs(hideBin(process.argv))
         if (UserSingleton.getInstance().getUser()) {
           console.log("User not authenticated");
         } else {
-          console.log("User doesn't exist!")
+          console.log("User doesn't exist!");
         }
         return;
       } else {
@@ -155,7 +153,7 @@ yargs(hideBin(process.argv))
   .command({
     command: "generate",
     describe: "Generates a secure password",
-    handler: function (argv) {
+    handler: function () {
       if (!isAuthenticated()) {
         if (UserSingleton.getInstance().getUser()) {
           console.log("User not authenticated");
@@ -217,20 +215,44 @@ yargs(hideBin(process.argv))
   .command({
     command: "status",
     description: "Check the User status",
-    handler: function() {
+    handler: function () {
       const user = UserSingleton.getInstance().getUser();
       if (!user) {
         console.log("User doenst exist!");
       } else {
         console.log(user);
-    }}
+      }
+    },
   })
   .command({
     command: "delete-user",
     description: "Delete the current User and all Passwords",
-    handler: function() {
-      UserSingleton.getInstance().delete();
-      console.log("Success!")
-    }
+    handler: function () {
+      const user = UserSingleton.getInstance().getUser();
+      if (user) {
+        try {
+          const rl = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout,
+          });
+          rl.question(
+            "Do you want to delete the currently active user? (y/n) ",
+            (delete_user) => {
+              if (delete_user === "y") {
+                UserSingleton.getInstance().delete();
+                console.log("Success!");
+              } else {
+                console.log("Process aborted!");
+              }
+              rl.close();
+            }
+          );
+        } catch (e) {
+          console.log("Error: ", e.message);
+        }
+      } else {
+        console.log("User doesn't exist!");
+      }
+    },
   })
   .parse();
