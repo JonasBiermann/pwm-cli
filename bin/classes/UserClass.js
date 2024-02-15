@@ -1,9 +1,9 @@
 export class User {
-  constructor(username, password, face_data, user_key) {
+  constructor(username, password, face_data, session, user_key) {
     this.username = username;
     this.password = password;
     this.face_data = face_data;
-    this.session = true;
+    this.session = session;
     this.user_key = user_key;
   }
 

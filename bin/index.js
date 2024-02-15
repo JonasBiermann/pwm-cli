@@ -14,13 +14,22 @@ function isAuthenticated() {
   return user && user.getSession();
 }
 
+function checkUser() {
+  const user = UserSingleton.getInstance().getUser()
+  if (user) {
+    return user;
+  }
+  return null;
+}
 yargs(hideBin(process.argv))
   .command({
     command: "create-user",
     describe: "Create User",
-    handler: async function () {
-      const user = UserSingleton.getInstance().getUser();
-      if (!user) {
+    handler: function () {
+      const user = checkUser()
+      if (user) {
+        console.log("User already exists!");
+      } else {
         try {
           const rl = readline.createInterface({
             input: process.stdin,
@@ -45,8 +54,6 @@ yargs(hideBin(process.argv))
         } catch (e) {
           console.error("Error creating user: ", e.message);
         }
-      } else {
-        console.log("user already exists!");
       }
     },
   })
@@ -54,17 +61,21 @@ yargs(hideBin(process.argv))
     command: "logout",
     describe: "Logout User",
     handler: function () {
-      if (isAuthenticated()) {
-        try {
-          const user_instance = UserSingleton.getInstance();
-          user_instance.logOutUser();
-          console.log("Successfully logged out User");
-          console.log(user_instance.getUser());
-        } catch (e) {
-          console.error("Error reading input: ", e.message);
+      if (UserSingleton.getInstance().getUser()){
+        if (isAuthenticated()) {
+          try {
+            const user_instance = UserSingleton.getInstance();
+            user_instance.logOutUser();
+            console.log("Successfully logged out User");
+            console.log(user_instance.getUser());
+          } catch (e) {
+            console.error("Error reading input: ", e.message);
+          }
+        } else {
+          console.log("User not authenticated!");
         }
       } else {
-        console.log("User not authenticated!");
+        console.log("User doesn't exist!")
       }
     },
   })
@@ -72,82 +83,83 @@ yargs(hideBin(process.argv))
     command: "authenticate",
     describe: "Authenticate User",
     handler: function () {
-      if (!isAuthenticated) {
-        try {
-          const rl = readline.createInterface({
-            input: process.stdin,
-            output: process.stdout,
-          });
-          rl.question("Enter your Password: ", (password) => {
-            const user = GlobalUser.getUser();
-            if (user && user.authenticateUser(password)) {
-              user.session = true;
-              console.log("User authenticated successfully.");
-            } else {
-              console.log("Authentication failed. User not found.");
-            }
-            rl.close();
-          });
-        } catch (e) {
-          console.error("Error reading input: ", error.message);
-        }
-      } else {
-        if (UserSingleton.getInstance().getUser()) {
-          console.log("User is already authenticated");
+      const user = checkUser()
+      if (user) {
+        if (!isAuthenticated()) {
+          try {
+            const rl = readline.createInterface({
+              input: process.stdin,
+              output: process.stdout,
+            });
+            rl.question("Enter your Password: ", (password) => {
+              if (user && user.authenticateUser(password)) {
+                user.session = true;
+                UserSingleton.getInstance().logInUser()
+                console.log("User authenticated successfully.");
+              } else {
+                console.log("Authentication failed. User not found.");
+              }
+              rl.close();
+            });
+          } catch (e) {
+            console.error("Error reading input: ", error.message);
+          }
         } else {
-          console.log("User doesn't exist!");
-        }
+            console.log("User is already authenticated");
+          }
+      } else {
+        console.log("User doesn't exist!")
       }
     },
   })
   .command({
     command: "add",
     describe: "Add a new password",
-    handler: async function () {
-      if (!isAuthenticated()) {
-        if (UserSingleton.getInstance().getUser()) {
-          console.log("User not authenticated");
-        } else {
-          console.log("User doesn't exist!");
-        }
-        return;
-      } else {
-        try {
-          const rl = readline.createInterface({
-            input: process.stdin,
-            output: process.stdout,
-          });
-
-          rl.question("Website URL: ", (website) => {
-            rl.question("Username: ", (username) => {
-              rl.question("Password: ", (password) => {
-                rl.question("Starred (y/n): ", (starred) => {
-                  // Create password object
-                  const new_password = create_password(
-                    website,
-                    username,
-                    password,
-                    starred.toLowerCase() === "y"
-                  );
-
-                  // Do something with the new password object (e.g., save it)
-                  let user_password_data = new Storage(
-                    "userData.json",
-                    user.user_key
-                  );
-                  console.log("New Password:", new_password);
-                  user_password_data.savePassword(new_password);
-
-                  // Close the readline interface
-                  rl.close();
+    handler: function () {
+      const user = checkUser();
+      if (user) {
+        if (isAuthenticated()) {
+          try {
+            const rl = readline.createInterface({
+              input: process.stdin,
+              output: process.stdout,
+            });
+  
+            rl.question("Website URL: ", (website) => {
+              rl.question("Username: ", (username) => {
+                rl.question("Password: ", (password) => {
+                  rl.question("Starred (y/n): ", (starred) => {
+                    // Create password object
+                    const new_password = create_password(
+                      website,
+                      username,
+                      password,
+                      starred.toLowerCase() === "y"
+                    );
+  
+                    // Do something with the new password object (e.g., save it)
+                    let user_password_data = new Storage(
+                      "userData.json",
+                      user.user_key
+                    );
+                    console.log("New Password:", new_password);
+                    user_password_data.savePassword(new_password);
+  
+                    // Close the readline interface
+                    rl.close();
+                  });
                 });
               });
             });
-          });
-        } catch (error) {
-          console.error("Error:", error.message);
-        }
+          } catch (error) {
+            console.error("Error:", error.message);
+          }
+        } else {
+        console.log("User is not authenticated!")
       }
+    } else {
+      console.log("User doesn't exist!")
+    }
     },
   })
   .command({
@@ -216,11 +228,11 @@ yargs(hideBin(process.argv))
     command: "status",
     description: "Check the User status",
     handler: function () {
-      const user = UserSingleton.getInstance().getUser();
-      if (!user) {
-        console.log("User doenst exist!");
-      } else {
+      const user = checkUser()
+      if (user) {
         console.log(user);
+      } else {
+        console.log("User doenst exist!");
       }
     },
   })
@@ -228,7 +240,7 @@ yargs(hideBin(process.argv))
     command: "delete-user",
     description: "Delete the current User and all Passwords",
     handler: function () {
-      const user = UserSingleton.getInstance().getUser();
+      const user = checkUser()
       if (user) {
         try {
           const rl = readline.createInterface({

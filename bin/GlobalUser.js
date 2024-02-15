@@ -29,6 +29,7 @@ class UserSingleton {
   }
 
   static getInstance() {
+    console.log(!UserSingleton.instance)
     if (!UserSingleton.instance) {
       UserSingleton.instance = new UserSingleton();
     }
@@ -58,12 +59,14 @@ class UserSingleton {
   readUserDataFromFile() {
     try {
       const userData = fs.readFileSync(USER_FILE_PATH, "utf-8");
+      console.log(userData)
       const userDataObject = JSON.parse(userData);
       if (userDataObject) {
         return new User(
           userDataObject.username,
           userDataObject.password,
           userDataObject.face_data,
+          userDataObject.session,
           userDataObject.user_key
         );
       return null; 
@@ -83,6 +86,11 @@ class UserSingleton {
 
   logOutUser() {
     this.user.session = false;
+    this.writeUserDataToFile();
+  }
+
+  logInUser() {
+    this.user.session = true;
     this.writeUserDataToFile();
   }
 
