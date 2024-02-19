@@ -1,7 +1,7 @@
 import crypto from "crypto";
 import fs from "fs";
 
-export class Storage {
+class Storage {
   constructor(file_path, encryption_key) {
     this.file_path = file_path;
     this.encryption_key = Buffer.from(encryption_key, "hex");
@@ -81,3 +81,6 @@ export class Storage {
     return passwords;
   }
 }
+
+
+export default Storage

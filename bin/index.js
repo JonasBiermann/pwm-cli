@@ -6,7 +6,7 @@ import { hideBin } from "yargs/helpers";
 import readline from "readline";
 import crypto from "crypto";
 import { create_password, generate_password } from "./classes/PasswordClass.js";
-import { User } from "./classes/UserClass.js";
+import Storage from "./classes/StorageClass.js";
 
 // Function to check if user is authenticated
 function isAuthenticated() {
@@ -113,118 +113,6 @@ yargs(hideBin(process.argv))
     },
   })
   .command({
-    command: "add",
-    describe: "Add a new password",
-    handler: function () {
-      const user = checkUser();
-      if (user) {
-        if (isAuthenticated()) {
-          try {
-            const rl = readline.createInterface({
-              input: process.stdin,
-              output: process.stdout,
-            });
-  
-            rl.question("Website URL: ", (website) => {
-              rl.question("Username: ", (username) => {
-                rl.question("Password: ", (password) => {
-                  rl.question("Starred (y/n): ", (starred) => {
-                    // Create password object
-                    const new_password = create_password(
-                      website,
-                      username,
-                      password,
-                      starred.toLowerCase() === "y"
-                    );
-  
-                    // Do something with the new password object (e.g., save it)
-                    let user_password_data = new Storage(
-                      "userData.json",
-                      user.user_key
-                    );
-                    console.log("New Password:", new_password);
-                    user_password_data.savePassword(new_password);
-  
-                    // Close the readline interface
-                    rl.close();
-                  });
-                });
-              });
-            });
-          } catch (error) {
-            console.error("Error:", error.message);
-          }
-        } else {
-        console.log("User is not authenticated!")
-      }
-    } else {
-      console.log("User doesn't exist!")
-    }
-    },
-  })
-  .command({
-    command: "generate",
-    describe: "Generates a secure password",
-    handler: function () {
-      if (!isAuthenticated()) {
-        if (UserSingleton.getInstance().getUser()) {
-          console.log("User not authenticated");
-        } else {
-          console.log("User doesnt't exist!");
-        }
-        return;
-      } else {
-        try {
-          const rl = readline.createInterface({
-            input: process.stdin,
-            output: process.stdout,
-          });
-
-          rl.question("Password Length: ", (length) => {
-            console.log(length);
-            length = Number(length);
-            let secure_password = generate_password(length);
-
-            console.log(secure_password);
-            rl.question(
-              "Do you want to save this password? (y/n): ",
-              (save) => {
-                if (save === "y") {
-                  rl.question("Website: ", (website) => {
-                    rl.question("Username: ", (username) => {
-                      rl.question("Starred (y/n): ", (starred) => {
-                        // Create password object
-                        const new_password = create_password(
-                          website,
-                          username,
-                          secure_password,
-                          starred.toLowerCase() === "y"
-                        );
-
-                        // Do something with the new password object (e.g., save it)
-                        let user_password_data = new Storage(
-                          "userData.json",
-                          user.user_key
-                        );
-                        console.log("New Password:", new_password);
-                        user_password_data.savePassword(new_password);
-                        rl.close();
-                      });
-                    });
-                  });
-                } else {
-                  rl.close();
-                }
-              }
-            );
-          });
-        } catch (e) {
-          console.log("Error:", e.message);
-        }
-      }
-    },
-  })
-  .command({
     command: "status",
     description: "Check the User status",
     handler: function () {
@@ -264,6 +152,118 @@ yargs(hideBin(process.argv))
         }
       } else {
         console.log("User doesn't exist!");
+      }
+    },
+  })
+  .command({
+    command: "add",
+    describe: "Add a new password",
+    handler: function () {
+      const user = checkUser();
+      if (user) {
+        if (isAuthenticated()) {
+          try {
+            const rl = readline.createInterface({
+              input: process.stdin,
+              output: process.stdout,
+            });
+  
+            rl.question("Website URL: ", (website) => {
+              rl.question("Username: ", (username) => {
+                rl.question("Password: ", (password) => {
+                  rl.question("Starred (y/n): ", (starred) => {
+                    // Create password object
+                    const new_password = create_password(
+                      website,
+                      username,
+                      password,
+                      starred.toLowerCase() === "y"
+                    );
+  
+                    // Do something with the new password object (e.g., save it)
+                    let user_password_data = new Storage(
+                      "passwordData.json",
+                      user.user_key
+                    );
+                    console.log("New Password:", new_password);
+                    user_password_data.savePassword(new_password);
+  
+                    // Close the readline interface
+                    rl.close();
+                  });
+                });
+              });
+            });
+          } catch (error) {
+            console.error("Error:", error.message);
+          }
+        } else {
+        console.log("User is not authenticated!")
+      }
+    } else {
+      console.log("User doesn't exist!")
+    }
+    },
+  })
+  .command({
+    command: "generate",
+    describe: "Generates a secure password",
+    handler: function () {
+      const user = checkUser();
+      if (user) {
+        if (!isAuthenticated()) {
+          try {
+            const rl = readline.createInterface({
+              input: process.stdin,
+              output: process.stdout,
+            });
+  
+            rl.question("Password Length: ", (length) => {
+              console.log(length);
+              length = Number(length);
+              let secure_password = generate_password(length);
+  
+              console.log(secure_password);
+              rl.question(
+                "Do you want to save this password? (y/n): ",
+                (save) => {
+                  if (save === "y") {
+                    rl.question("Website: ", (website) => {
+                      rl.question("Username: ", (username) => {
+                        rl.question("Starred (y/n): ", (starred) => {
+                          // Create password object
+                          const new_password = create_password(
+                            website,
+                            username,
+                            secure_password,
+                            starred.toLowerCase() === "y"
+                          );
+  
+                          // Do something with the new password object (e.g., save it)
+                          let user_password_data = new Storage(
+                            "userData.json",
+                            user.user_key
+                          );
+                          console.log("New Password:", new_password);
+                          user_password_data.savePassword(new_password);
+                          rl.close();
+                        });
+                      });
+                    });
+                  } else {
+                    rl.close();
+                  }
+                }
+              );
+            });
+          } catch (e) {
+            console.log("Error:", e.message);
+          }
+        } else {
+          console.log("User is not authentiacted!")
+        }
+      } else {
+        console.log("User doesn't exist!")
       }
     },
   })
