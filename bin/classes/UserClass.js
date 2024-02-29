@@ -1,10 +1,12 @@
+import Storage from "./StorageClass.js";
+
 export class User {
   constructor(username, password, face_data, session, user_key) {
     this.username = username;
     this.password = password;
     this.face_data = face_data;
     this.session = session;
-    this.user_key = user_key;
+    this.storage = new Storage("passwordData.json", user_key);
   }
 
   authenticateUser(entered_password) {

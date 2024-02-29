@@ -9,9 +9,8 @@ import { create_password, generate_password } from "./classes/PasswordClass.js";
 import Storage from "./classes/StorageClass.js";
 
 // Function to check if user is authenticated
-function isAuthenticated() {
-  const user = UserSingleton.getInstance().getUser();
-  return user && user.getSession();
+function isAuthenticated(user) {
+  return user.getSession();
 }
 
 function checkUser() {
@@ -61,8 +60,9 @@ yargs(hideBin(process.argv))
     command: "logout",
     describe: "Logout User",
     handler: function () {
-      if (UserSingleton.getInstance().getUser()){
-        if (isAuthenticated()) {
+      const user = checkUser()
+      if (user){
+        if (isAuthenticated(user)) {
           try {
             const user_instance = UserSingleton.getInstance();
             user_instance.logOutUser();
@@ -85,7 +85,7 @@ yargs(hideBin(process.argv))
     handler: function () {
       const user = checkUser()
       if (user) {
-        if (!isAuthenticated()) {
+        if (!isAuthenticated(user)) {
           try {
             const rl = readline.createInterface({
               input: process.stdin,
@@ -161,7 +161,7 @@ yargs(hideBin(process.argv))
     handler: function () {
       const user = checkUser();
       if (user) {
-        if (isAuthenticated()) {
+        if (isAuthenticated(user)) {
           try {
             const rl = readline.createInterface({
               input: process.stdin,
@@ -211,7 +211,7 @@ yargs(hideBin(process.argv))
     handler: function () {
       const user = checkUser();
       if (user) {
-        if (!isAuthenticated()) {
+        if (isAuthenticated(user)) {
           try {
             const rl = readline.createInterface({
               input: process.stdin,
@@ -266,5 +266,21 @@ yargs(hideBin(process.argv))
         console.log("User doesn't exist!")
       }
     },
+  })
+  .command({
+    command: "show-all",
+    describe: "Show list of stored passwords for websites.",
+    handler() {
+      const user = checkUser()
+      if (user) {
+        if (isAuthenticated(user)) {
+          let passwords = user.getPasswords()
+        } else {
+          console.log("User not authenticated!")
+        }
+      } else {
+        console.log("User doesn't exist!")
+      }
+    }
   })
   .parse();

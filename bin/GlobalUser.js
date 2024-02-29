@@ -98,6 +98,7 @@ class UserSingleton {
   delete() {
     this.user = null;
     this.writeUserDataToFile();
+    
   }
 }
 
