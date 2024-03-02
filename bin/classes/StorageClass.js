@@ -55,8 +55,8 @@ class Storage {
   }
 
   // savePassword method takes password_object (created by user in CLI) as argument and adds password to password list by getting -> decrypting -> appending -> encrypting and writing passwords
-  savePassword(password_object) {
-    let passwords = this.getPasswords();
+  savePasswordToStorage(password_object) {
+    let passwords = this.getPasswordsFromStorage();
     if (passwords == null) {
       passwords = [];
     }
@@ -68,7 +68,7 @@ class Storage {
   }
 
   // getPasswords method returns all saved passwords in a decrypted way
-  getPasswords() {
+  getPasswordsFromStorage() {
     let passwords = [];
     try {
       let data = fs.readFileSync(this.file_path, "utf-8");
@@ -82,5 +82,4 @@ class Storage {
   }
 }
 
-
-export default Storage
+export default Storage;

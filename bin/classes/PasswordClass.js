@@ -1,6 +1,6 @@
 export class Password {
   constructor(website, username, password, starred) {
-    this.webiste = website;
+    this.website = website;
     this.username = username;
     this.password = password;
     this.starred = starred;
@@ -35,12 +35,12 @@ export class Password {
   }
 }
 
-export function create_password(website, username, password, starred) {
+export function createPassword(website, username, password, starred) {
   let entry = new Password(website, username, password, starred);
   return entry;
 }
 
-export function generate_password(length) {
+export function generatePassword(length) {
   const charset =
     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+[]{}|;:',.<>/?.,";
   let password = "";

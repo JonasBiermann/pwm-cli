@@ -1,4 +1,5 @@
 import { User } from "./classes/UserClass.js";
+import { createPassword, generatePassword } from "./classes/PasswordClass.js";
 
 // export const GlobalUser = (() => {
 //   let user_instance = null;
@@ -29,7 +30,6 @@ class UserSingleton {
   }
 
   static getInstance() {
-    console.log(!UserSingleton.instance)
     if (!UserSingleton.instance) {
       UserSingleton.instance = new UserSingleton();
     }
@@ -39,7 +39,7 @@ class UserSingleton {
   createUser(username, password, face_data, user_key) {
     this.user = new User(username, password, face_data, true, user_key);
     this.writeUserDataToFile();
-    fs.writeFileSync("passwordData.json", JSON.stringify(""), "utf-8")
+    fs.writeFileSync("passwordData.json", JSON.stringify(""), "utf-8");
   }
 
   getUser() {
@@ -59,18 +59,16 @@ class UserSingleton {
 
   readUserDataFromFile() {
     try {
-      const userData = fs.readFileSync(USER_FILE_PATH, "utf-8");
-      console.log(userData)
-      const userDataObject = JSON.parse(userData);
-      if (userDataObject) {
+      const user_data = fs.readFileSync(USER_FILE_PATH, "utf-8");
+      const user_data_object = JSON.parse(user_data);
+      if (user_data_object) {
         return new User(
-          userDataObject.username,
-          userDataObject.password,
-          userDataObject.face_data,
-          userDataObject.session,
-          userDataObject.user_key
+          user_data_object.username,
+          user_data_object.password,
+          user_data_object.face_data,
+          user_data_object.session,
+          user_data_object.storage.encryption_key
         );
-      return null; 
       }
     } catch (error) {
       console.error("Error reading user data from file:", error.message);
@@ -98,7 +96,23 @@ class UserSingleton {
   delete() {
     this.user = null;
     this.writeUserDataToFile();
-    
+  }
+
+  addPassword(website, username, password, starred) {
+    try {
+      const new_password = createPassword(website, username, password, starred);
+      this.user.storage.savePasswordToStorage(new_password);
+    } catch (e) {
+      console.error("Password couldn't be saved: ", e.message);
+    }
+  }
+
+  getPasswords() {
+    try {
+      return this.user.storage.getPasswordsFromStorage();
+    } catch (e) {
+      console.error("Couldn't get Passwords from Storage: ", e.message);
+    }
   }
 }
 
