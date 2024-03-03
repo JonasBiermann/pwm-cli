@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import fs from "fs";
+import { createPassword } from "./PasswordClass.js";
 
 class Storage {
   constructor(file_path, encryption_key) {
@@ -79,6 +80,29 @@ class Storage {
       console.error("File doesn't exist or couldn't be decrypted: ", e.message);
     }
     return passwords;
+  }
+
+  editPasswordsInStorage(website, property, new_value, passwords) {
+    // console.log(passwords);
+    fs.writeFileSync(this.file_path, "", "utf-8");
+    passwords.forEach((password) => {
+      if (password.website === website) {
+        if (property === "username") {
+          password.username = new_value;
+        } else if (property === "password") {
+          password.password = new_value;
+        } else {
+          password.starred = new_value;
+        }
+      }
+      let new_password = createPassword(
+        password.website,
+        password.username,
+        password.password,
+        "y"
+      );
+      this.savePasswordToStorage(new_password);
+    });
   }
 }
 

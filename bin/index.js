@@ -7,7 +7,8 @@ import readline from "readline";
 import crypto from "crypto";
 import { createPassword, generatePassword } from "./classes/PasswordClass.js";
 import Storage from "./classes/StorageClass.js";
-import { text } from "@clack/prompts";
+import { text, select, confirm } from "@clack/prompts";
+import clipboardy from "clipboardy";
 
 // Function to check if user is authenticated
 function isAuthenticated(user) {
@@ -20,6 +21,18 @@ function checkUser() {
     return user;
   }
   return null;
+}
+
+function getWebsiteOptions(websites) {
+  let website_options = [];
+  for (let i = 0; i < websites.length; i++) {
+    let dict = {
+      value: websites[i],
+      label: websites[i],
+    };
+    website_options.push(dict);
+  }
+  return website_options;
 }
 yargs(hideBin(process.argv))
   .command({
@@ -268,23 +281,85 @@ yargs(hideBin(process.argv))
       if (user) {
         if (isAuthenticated(user)) {
           const user_instance = UserSingleton.getInstance();
-          let passwords = Object.values(user_instance.getPasswords());
-          let websites = [];
-          console.log(passwords);
+          const password_objects = user_instance.getPasswords();
+          let passwords = Object.values(password_objects);
+          let websites = {};
+          // console.log(passwords);
+          let property_map = {
+            username: 0,
+            password: 1,
+            starred: 2,
+          };
           passwords.forEach((password) => {
-            console.log(typeof password.password);
-            websites.push(password.website);
+            // console.log(typeof password.password);
+            // websites.push(password.website);
+            websites[password.website] = [
+              password.username,
+              password.password,
+              password.starred,
+            ];
+          });
+          const password = await select({
+            message: "What password do you want to access?",
+            options: getWebsiteOptions(Object.keys(websites)),
+          });
+          const password_options = await select({
+            message: "Choose Password property to edit/copy.",
+            options: [
+              {
+                value: "username",
+                label: `Username: ${
+                  websites[password][property_map["username"]]
+                }`,
+              },
+              {
+                value: "password",
+                label: `Password: ${
+                  websites[password][property_map["password"]]
+                }`,
+              },
+              {
+                value: "starred",
+                label: `Starred: ${
+                  websites[password][property_map["starred"]]
+                }`,
+              },
+            ],
           });
 
-          console.log(websites);
-          const meaning = await text({
-            message: "What is the meaning of life?",
-            placeholder: "Not sure",
-            initialValue: "42",
-            validate(value) {
-              if (value.length === 0) return `Value is required!`;
-            },
+          const action = await select({
+            message: "Choose what to do with this property.",
+            options: [
+              { value: "copy", label: "Copy Property" },
+              { value: "edit", label: "Edit Property" },
+            ],
           });
+
+          if (action === "copy") {
+            clipboardy.writeSync(
+              websites[password][property_map[password_options]]
+            );
+          } else {
+            if (password_options != property_map[2]) {
+              const newEntry = await text({
+                message: `What should your new ${password_options} be?`,
+                placeholder: websites[password][property_map[password_options]],
+                validate(value) {
+                  if (value.length === 0) return "Please input a value!";
+                },
+              });
+              user_instance.editPasswords(
+                password,
+                password_options,
+                newEntry,
+                password_objects
+              );
+            } else {
+              const changeStarred = await confirm({
+                message: "Do you want to star this password?",
+              });
+            }
+          }
         } else {
           console.log("User not authenticated!");
         }

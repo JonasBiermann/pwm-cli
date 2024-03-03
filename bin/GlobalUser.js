@@ -114,6 +114,19 @@ class UserSingleton {
       console.error("Couldn't get Passwords from Storage: ", e.message);
     }
   }
+
+  editPasswords(website, property, new_value, passwords) {
+    try {
+      return this.user.storage.editPasswordsInStorage(
+        website,
+        property,
+        new_value,
+        passwords
+      );
+    } catch (e) {
+      console.error("Couldn't edit Passwords in Storage: ", e.message);
+    }
+  }
 }
 
 export default UserSingleton;
