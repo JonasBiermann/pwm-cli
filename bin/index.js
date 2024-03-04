@@ -7,7 +7,7 @@ import readline from "readline";
 import crypto from "crypto";
 import { createPassword, generatePassword } from "./classes/PasswordClass.js";
 import Storage from "./classes/StorageClass.js";
-import { text, select, confirm } from "@clack/prompts";
+import { text, select, confirm, group } from "@clack/prompts";
 import clipboardy from "clipboardy";
 
 // Function to check if user is authenticated
@@ -73,15 +73,18 @@ yargs(hideBin(process.argv))
   .command({
     command: "logout",
     describe: "Logout User",
-    handler: function () {
+    handler: async function () {
       const user = checkUser();
       if (user) {
         if (isAuthenticated(user)) {
           try {
             const user_instance = UserSingleton.getInstance();
-            user_instance.logOutUser();
-            console.log("Successfully logged out User");
-            console.log(user_instance.getUser());
+            const log_out_check = await confirm({
+              message: "Are you sure you want to log out?"
+            })
+            if (log_out_check) {
+              user_instance.logOutUser();
+            }
           } catch (e) {
             console.error("Error reading input: ", e.message);
           }
@@ -96,25 +99,30 @@ yargs(hideBin(process.argv))
   .command({
     command: "authenticate",
     describe: "Authenticate User",
-    handler: function () {
-      const user = checkUser();
+    handler: async function () {
+      const user = checkUser()
+      const user_instance = UserSingleton.getInstance()
       if (user) {
         if (!isAuthenticated(user)) {
           try {
-            const rl = readline.createInterface({
-              input: process.stdin,
-              output: process.stdout,
-            });
-            rl.question("Enter your Password: ", (password) => {
-              if (user && user.authenticateUser(password)) {
-                user.session = true;
-                UserSingleton.getInstance().logInUser();
-                console.log("User authenticated successfully.");
+            let password = "";
+            let try_again = true;
+            while (try_again && !isAuthenticated(user)) {
+              password = await text({
+                message: "What is your password?",
+                validate(value) {
+                  if (value.length === 0) return "Please enter your Password!"
+                }
+              })
+              if (user && user_instance.authenticateUser(password)) {
+                user_instance.logInUser()
+                try_again = false
               } else {
-                console.log("Authentication failed. User not found.");
+                try_again = await confirm({
+                  message: "Do you want to try again?"
+                }) 
               }
-              rl.close();
-            });
+            }
           } catch (e) {
             console.error("Error reading input: ", error.message);
           }
@@ -141,26 +149,17 @@ yargs(hideBin(process.argv))
   .command({
     command: "delete-user",
     description: "Delete the current User and all Passwords",
-    handler: function () {
+    handler: async function () {
       const user = checkUser();
+      const user_instance = UserSingleton.getInstance();
       if (user) {
         try {
-          const rl = readline.createInterface({
-            input: process.stdin,
-            output: process.stdout,
-          });
-          rl.question(
-            "Do you want to delete the currently active user? (y/n) ",
-            (delete_user) => {
-              if (delete_user === "y") {
-                UserSingleton.getInstance().delete();
-                console.log("Success!");
-              } else {
-                console.log("Process aborted!");
-              }
-              rl.close();
-            }
-          );
+          const delete_user_check = await confirm({
+            message: "Do you want to delete the currently active user?"
+          })
+          if (delete_user_check) {
+            user_instance.delete();
+          }
         } catch (e) {
           console.log("Error: ", e.message);
         }
@@ -172,34 +171,24 @@ yargs(hideBin(process.argv))
   .command({
     command: "add",
     describe: "Add a new password",
-    handler: function () {
+    handler: async function () {
       const user = checkUser();
+      const user_instance = UserSingleton.getInstance();
       if (user) {
         if (isAuthenticated(user)) {
           try {
-            const rl = readline.createInterface({
-              input: process.stdin,
-              output: process.stdout,
-            });
-            const user_instance = UserSingleton.getInstance();
-            rl.question("Website URL: ", (website) => {
-              rl.question("Username: ", (username) => {
-                rl.question("Password: ", (password) => {
-                  rl.question("Starred (y/n): ", (starred) => {
-                    // Create password object
-                    user_instance.addPassword(
-                      website,
-                      username,
-                      password,
-                      starred.toLowerCase() === "y"
-                    );
-
-                    // Close the readline interface
-                    rl.close();
-                  });
-                });
-              });
-            });
+            const new_password = await group({
+              website: () => text({ message: "What is the website?"}),
+              username: () => text({ message: "What is your username?"}),
+              password: () => text({ message: "What is your password?"}),
+              starred: () => confirm({ message: "Do you want to star this password?"}),
+            })
+            user_instance.addPassword(
+              new_password.website,
+              new_password.username,
+              new_password.password,
+              new_password.starred,
+            )
           } catch (error) {
             console.error("Error:", error.message);
           }
@@ -214,16 +203,21 @@ yargs(hideBin(process.argv))
   .command({
     command: "generate",
     describe: "Generates a secure password",
-    handler: function () {
+    handler: async function () {
       const user = checkUser();
+      const user_instance = UserSingleton.getInstance();
       if (user) {
         if (isAuthenticated(user)) {
           try {
-            const rl = readline.createInterface({
-              input: process.stdin,
-              output: process.stdout,
-            });
-
+            const password_length = await text({
+              message: "How long should your new password be?",
+              validate(value) {
+                if (typeof parseInt(value) != number) return "Please input a number!";
+              }
+            })
+            console.log(typeof 5)
+            console.log(parseInt(typeof password_length))
+            
             rl.question("Password Length: ", (length) => {
               console.log(length);
               length = Number(length);

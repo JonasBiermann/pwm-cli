@@ -88,6 +88,10 @@ class UserSingleton {
     this.writeUserDataToFile();
   }
 
+  authenticateUser(password) {
+    return this.user.authenticateUser(password)
+  }
+
   logInUser() {
     this.user.session = true;
     this.writeUserDataToFile();

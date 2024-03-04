@@ -15,7 +15,7 @@ export class User {
       this.session = true;
       return true;
     } else {
-      throw new Error("Couldn't authenticate user!");
+      return false;
     }
   }
 
