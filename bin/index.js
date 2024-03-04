@@ -5,10 +5,17 @@ import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import readline from "readline";
 import crypto from "crypto";
-import { createPassword, generatePassword } from "./classes/PasswordClass.js";
+import { generatePassword } from "./classes/PasswordClass.js";
 import Storage from "./classes/StorageClass.js";
-import { text, select, confirm, group } from "@clack/prompts";
+import { intro, text, select, confirm, group, password } from "@clack/prompts";
 import clipboardy from "clipboardy";
+import chalk from "chalk";
+
+intro(
+  `${chalk.hex("#171717")(
+    chalk.hex("#1998c2").bold("Password Manager CLI by Jonas Biermann")
+  )}`
+);
 
 // Function to check if user is authenticated
 function isAuthenticated(user) {
@@ -34,42 +41,27 @@ function getWebsiteOptions(websites) {
   }
   return website_options;
 }
+
+async function createUser() {
+  const create_user = await group({
+    username: () => text({ message: "Please set your Username!" }),
+    password: () => text({ message: "Please set your Password!" }),
+  });
+  let user_key = crypto.randomBytes(32).toString("hex");
+  UserSingleton.getInstance().createUser(
+    create_user.username,
+    create_user.password,
+    "",
+    user_key
+  );
+}
+
+let user = checkUser();
+if (!user) {
+  createUser();
+}
+
 yargs(hideBin(process.argv))
-  .command({
-    command: "create-user",
-    describe: "Create User",
-    handler: function () {
-      const user = checkUser();
-      if (user) {
-        console.log("User already exists!");
-      } else {
-        try {
-          const rl = readline.createInterface({
-            input: process.stdin,
-            output: process.stdout,
-          });
-
-          rl.question("Username: ", (username) => {
-            rl.question("Password: ", (password) => {
-              let user_key = crypto.randomBytes(32).toString("hex");
-
-              // Use the singleton instance to create the user
-              UserSingleton.getInstance().createUser(
-                username,
-                password,
-                "",
-                user_key
-              );
-              console.log("User created successfully.");
-              rl.close();
-            });
-          });
-        } catch (e) {
-          console.error("Error creating user: ", e.message);
-        }
-      }
-    },
-  })
   .command({
     command: "logout",
     describe: "Logout User",
@@ -80,8 +72,8 @@ yargs(hideBin(process.argv))
           try {
             const user_instance = UserSingleton.getInstance();
             const log_out_check = await confirm({
-              message: "Are you sure you want to log out?"
-            })
+              message: "Are you sure you want to log out?",
+            });
             if (log_out_check) {
               user_instance.logOutUser();
             }
@@ -100,8 +92,8 @@ yargs(hideBin(process.argv))
     command: "authenticate",
     describe: "Authenticate User",
     handler: async function () {
-      const user = checkUser()
-      const user_instance = UserSingleton.getInstance()
+      const user = checkUser();
+      const user_instance = UserSingleton.getInstance();
       if (user) {
         if (!isAuthenticated(user)) {
           try {
@@ -111,16 +103,16 @@ yargs(hideBin(process.argv))
               password = await text({
                 message: "What is your password?",
                 validate(value) {
-                  if (value.length === 0) return "Please enter your Password!"
-                }
-              })
+                  if (value.length === 0) return "Please enter your Password!";
+                },
+              });
               if (user && user_instance.authenticateUser(password)) {
-                user_instance.logInUser()
-                try_again = false
+                user_instance.logInUser();
+                try_again = false;
               } else {
                 try_again = await confirm({
-                  message: "Do you want to try again?"
-                }) 
+                  message: "Do you want to try again?",
+                });
               }
             }
           } catch (e) {
@@ -155,8 +147,8 @@ yargs(hideBin(process.argv))
       if (user) {
         try {
           const delete_user_check = await confirm({
-            message: "Do you want to delete the currently active user?"
-          })
+            message: "Do you want to delete the currently active user?",
+          });
           if (delete_user_check) {
             user_instance.delete();
           }
@@ -178,17 +170,20 @@ yargs(hideBin(process.argv))
         if (isAuthenticated(user)) {
           try {
             const new_password = await group({
-              website: () => text({ message: "What is the website?"}),
-              username: () => text({ message: "What is your username?"}),
-              password: () => text({ message: "What is your password?"}),
-              starred: () => confirm({ message: "Do you want to star this password?"}),
-            })
+              website: () => text({ message: "What is the website?" }),
+              username: () => text({ message: "What is your username?" }),
+              // check_generate: () =>
+              //   confirm({ message: "Do you want to generate the Password?" }),
+              password: () => text({ message: "What is your password?" }),
+              starred: () =>
+                confirm({ message: "Do you want to star this password?" }),
+            });
             user_instance.addPassword(
               new_password.website,
               new_password.username,
               new_password.password,
-              new_password.starred,
-            )
+              new_password.starred
+            );
           } catch (error) {
             console.error("Error:", error.message);
           }
@@ -209,53 +204,42 @@ yargs(hideBin(process.argv))
       if (user) {
         if (isAuthenticated(user)) {
           try {
-            const password_length = await text({
+            let password_length = await text({
               message: "How long should your new password be?",
               validate(value) {
-                if (typeof parseInt(value) != number) return "Please input a number!";
-              }
-            })
-            console.log(typeof 5)
-            console.log(parseInt(typeof password_length))
-            
-            rl.question("Password Length: ", (length) => {
-              console.log(length);
-              length = Number(length);
-              let secure_password = generatePassword(length);
-
-              console.log(secure_password);
-              rl.question(
-                "Do you want to save this password? (y/n): ",
-                (save) => {
-                  if (save === "y") {
-                    rl.question("Website: ", (website) => {
-                      rl.question("Username: ", (username) => {
-                        rl.question("Starred (y/n): ", (starred) => {
-                          // Create password object
-                          const new_password = createPassword(
-                            website,
-                            username,
-                            secure_password,
-                            starred.toLowerCase() === "y"
-                          );
-
-                          // Do something with the new password object (e.g., save it)
-                          let user_password_data = new Storage(
-                            "userData.json",
-                            user.user_key
-                          );
-                          console.log("New Password:", new_password);
-                          user_password_data.savePassword(new_password);
-                          rl.close();
-                        });
-                      });
-                    });
-                  } else {
-                    rl.close();
-                  }
-                }
-              );
+                if (!isFinite(value)) return "Please input a number!";
+              },
             });
+
+            password_length = Number(password_length);
+            let secure_password = generatePassword(password_length);
+
+            // console.log(secure_password);
+
+            const save_password_check = await select({
+              message: "Do you want to save or copy this password?",
+              options: [
+                { value: "save", label: "Save" },
+                { value: "copy", label: "Copy" },
+              ],
+            });
+
+            if (save_password_check === "save") {
+              const generated_password_group = await group({
+                website: () => text({ message: "What is the website?" }),
+                username: () => text({ message: "What is your username?" }),
+                starred: () =>
+                  confirm({ message: "Do you want to star this password?" }),
+              });
+              user_instance.addPassword(
+                generated_password_group.website,
+                generated_password_group.username,
+                secure_password,
+                generated_password_group.starred
+              );
+            } else {
+              clipboardy.writeSync(secure_password);
+            }
           } catch (e) {
             console.log("Error:", e.message);
           }
