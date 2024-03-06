@@ -100,6 +100,7 @@ class UserSingleton {
   delete() {
     this.user = null;
     this.writeUserDataToFile();
+    fs.unlinkSync('passwordData.json');
   }
 
   addPassword(website, username, password, starred) {
