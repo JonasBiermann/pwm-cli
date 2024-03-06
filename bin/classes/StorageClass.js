@@ -73,7 +73,7 @@ class Storage {
     let passwords = [];
     try {
       let data = fs.readFileSync(this.file_path, "utf-8");
-      if (!data) {
+      if (!JSON.parse(data) === "") {
         passwords = this.decrypt(data);
       }
     } catch (e) {
@@ -99,7 +99,7 @@ class Storage {
         password.website,
         password.username,
         password.password,
-        password.starred,
+        password.starred
       );
       this.savePasswordToStorage(new_password);
     });

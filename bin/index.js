@@ -44,13 +44,22 @@ function getWebsiteOptions(websites) {
 
 async function createUser() {
   const create_user = await group({
-    username: () => text({ message: "Please set your Username!", validate(value) {
-      if (value.length === 0) return "Please enter your Username!";
-    },}),
-    password: () => text({ message: "Please set your Password!" , validate(value) {
-      if (value.length === 0) return "Please enter your Password!";
-      if (value.length < 4) return "Please make your password at least 4 characters long!";
-    },}),
+    username: () =>
+      text({
+        message: "Please set your Username!",
+        validate(value) {
+          if (value.length === 0) return "Please enter your Username!";
+        },
+      }),
+    password: () =>
+      text({
+        message: "Please set your Password!",
+        validate(value) {
+          if (value.length === 0) return "Please enter your Password!";
+          if (value.length < 4)
+            return "Please make your password at least 4 characters long!";
+        },
+      }),
   });
   let user_key = crypto.randomBytes(32).toString("hex");
   UserSingleton.getInstance().createUser(
@@ -170,18 +179,33 @@ yargs(hideBin(process.argv))
         if (isAuthenticated(user)) {
           try {
             const new_password = await group({
-              website: () => text({ message: "What is the website?" , validate(value) {
-                if (value.length === 0) return "Please enter your Website!";
-              },}),
-              username: () => text({ message: "What is your username?" , validate(value) {
-                if (value.length === 0) return "Please enter your Username!";
-              },}),
+              website: () =>
+                text({
+                  message: "What is the website?",
+                  validate(value) {
+                    if (value.length === 0) return "Please enter your Website!";
+                  },
+                }),
+              username: () =>
+                text({
+                  message: "What is your username?",
+                  validate(value) {
+                    if (value.length === 0)
+                      return "Please enter your Username!";
+                  },
+                }),
               // check_generate: () =>
               //   confirm({ message: "Do you want to generate the Password?" }),
-              password: () => text({ message: "What is your password?", validate(value) {
-                if (value.length === 0) return "Please enter your Password!";
-                if (value.length < 4) return "Please make your password at least 4 characters long!";
-              },}),
+              password: () =>
+                text({
+                  message: "What is your password?",
+                  validate(value) {
+                    if (value.length === 0)
+                      return "Please enter your Password!";
+                    if (value.length < 4)
+                      return "Please make your password at least 4 characters long!";
+                  },
+                }),
               starred: () =>
                 confirm({ message: "Do you want to star this password?" }),
             });
@@ -215,7 +239,8 @@ yargs(hideBin(process.argv))
               message: "How long should your new password be?",
               validate(value) {
                 if (!isFinite(value)) return "Please input a number!";
-                if (Number(value) > 32) return "Your Passwords length must be smaller than 32 characters!"
+                if (Number(value) > 32)
+                  return "Your Passwords length must be smaller than 32 characters!";
               },
             });
 
@@ -234,12 +259,22 @@ yargs(hideBin(process.argv))
 
             if (save_password_check === "save") {
               const generated_password_group = await group({
-                website: () => text({ message: "What is the website?", validate(value) {
-                  if (value.length === 0) return "Please enter your Website!";
-                },}),
-                username: () => text({ message: "What is your username?" , validate(value) {
-                  if (value.length === 0) return "Please enter your Username!";
-                },}),
+                website: () =>
+                  text({
+                    message: "What is the website?",
+                    validate(value) {
+                      if (value.length === 0)
+                        return "Please enter your Website!";
+                    },
+                  }),
+                username: () =>
+                  text({
+                    message: "What is your username?",
+                    validate(value) {
+                      if (value.length === 0)
+                        return "Please enter your Username!";
+                    },
+                  }),
                 starred: () =>
                   confirm({ message: "Do you want to star this password?" }),
               });
@@ -266,7 +301,7 @@ yargs(hideBin(process.argv))
   .command({
     command: "show-all",
     describe: "Show list of stored passwords for websites.",
-    async handler() {
+    handler: async function () {
       const user = checkUser();
       if (user) {
         if (isAuthenticated(user)) {
@@ -276,9 +311,9 @@ yargs(hideBin(process.argv))
           let websites = {};
           // console.log(passwords);
           let property_map = {
-            "username": 0,
-            "password": 1,
-            "starred": 2,
+            username: 0,
+            password: 1,
+            starred: 2,
           };
           passwords.forEach((password) => {
             // console.log(typeof password.password);
@@ -316,7 +351,7 @@ yargs(hideBin(process.argv))
               },
             ],
           });
-          let action = ""
+          let action = "";
           let new_entry = "";
           if (password_options != "starred") {
             action = await select({
@@ -330,17 +365,17 @@ yargs(hideBin(process.argv))
             const star_password = await confirm({
               message: "Do you want to star this password?",
             });
-            new_entry = star_password
+            new_entry = star_password;
           }
-          console.log(action)
+          console.log(action);
           if (action === "copy") {
             clipboardy.writeSync(
               websites[password][property_map[password_options]]
             );
           } else if (action === "edit") {
             const generate_password = await confirm({
-              message: "Do you want to generate a new password?"
-            })
+              message: "Do you want to generate a new password?",
+            });
             if (generate_password) {
               let password_length = await text({
                 message: "How long should your new password be?",
@@ -348,7 +383,7 @@ yargs(hideBin(process.argv))
                   if (!isFinite(value)) return "Please input a number!";
                 },
               });
-  
+
               password_length = Number(password_length);
               new_entry = generatePassword(password_length);
             } else {
