@@ -89,6 +89,7 @@ class Storage {
         if (property === "username") {
           password.username = new_value;
         } else if (property === "password") {
+          console.log("test");
           password.password = new_value;
         } else {
           password.starred = new_value;
