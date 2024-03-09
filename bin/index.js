@@ -42,6 +42,52 @@ function getWebsiteOptions(websites) {
   return website_options;
 }
 
+function compareStrings(string1, pivot) {
+  let range = Math.min(string1.length, pivot.length);
+  for (let i = 0; i < range; i++) {
+    if (string1.charCodeAt(i) < pivot.charCodeAt(i)) {
+      return true;
+    } else if (string1.charCodeAt(i) > pivot.charCodeAt(i)) {
+      return false;
+    }
+  }
+  return string1.length <= pivot.length;
+}
+
+const quickSort = (arr) => {
+  if (arr.length <= 1) {
+    return arr;
+  }
+
+  let pivot = arr[0];
+  let left_arr = [];
+  let right_arr = [];
+
+  for (let i = 1; i < arr.length; i++) {
+    if (compareStrings(arr[i].website, pivot.website)) {
+      left_arr.push(arr[i]);
+    } else {
+      right_arr.push(arr[i]);
+    }
+  }
+
+  return [...quickSort(left_arr), pivot, ...quickSort(right_arr)];
+};
+
+function getWebsites(password_objects) {
+  let passwords = quickSort(Object.values(password_objects));
+  let websites = {};
+  console.log(quickSort(passwords));
+  passwords.forEach((password) => {
+    websites[password.website] = [
+      password.username,
+      password.password,
+      password.starred,
+    ];
+  });
+  return websites;
+}
+
 async function createUser() {
   const create_user = await group({
     username: () =>
@@ -303,111 +349,128 @@ yargs(hideBin(process.argv))
     describe: "Show list of stored passwords for websites.",
     handler: async function () {
       const user = checkUser();
+      const user_instance = UserSingleton.getInstance();
       if (user) {
         if (isAuthenticated(user)) {
-          const user_instance = UserSingleton.getInstance();
           const password_objects = user_instance.getPasswords();
-          let passwords = Object.values(password_objects);
-          let websites = {};
-          // console.log(passwords);
+          let websites = getWebsites(password_objects);
           let property_map = {
             username: 0,
             password: 1,
             starred: 2,
           };
-          passwords.forEach((password) => {
-            // console.log(typeof password.password);
-            // websites.push(password.website);
-            websites[password.website] = [
-              password.username,
-              password.password,
-              password.starred,
-            ];
-          });
-          const password = await select({
-            message: "What password do you want to access?",
-            options: getWebsiteOptions(Object.keys(websites)),
-          });
-          const password_options = await select({
-            message: "Choose Password property to edit/copy.",
-            options: [
-              {
-                value: "username",
-                label: `Username: ${
-                  websites[password][property_map["username"]]
-                }`,
-              },
-              {
-                value: "password",
-                label: `Password: ${
-                  websites[password][property_map["password"]]
-                }`,
-              },
-              {
-                value: "starred",
-                label: `Starred: ${
-                  websites[password][property_map["starred"]]
-                }`,
-              },
-            ],
-          });
-          let action = "";
-          let new_entry = "";
-          if (password_options != "starred") {
-            action = await select({
-              message: "Choose what to do with this property.",
+          if (Object.keys(websites).length != 0) {
+            const password = await select({
+              message: "What password do you want to access?",
+              options: getWebsiteOptions(Object.keys(websites)),
+            });
+            const password_options = await select({
+              message: "Choose Password property to edit/copy.",
               options: [
-                { value: "copy", label: "Copy Property" },
-                { value: "edit", label: "Edit Property" },
+                {
+                  value: "username",
+                  label: `Username: ${
+                    websites[password][property_map["username"]]
+                  }`,
+                },
+                {
+                  value: "password",
+                  label: `Password: ${
+                    websites[password][property_map["password"]]
+                  }`,
+                },
+                {
+                  value: "starred",
+                  label: `Starred: ${
+                    websites[password][property_map["starred"]]
+                  }`,
+                },
               ],
             });
-          } else {
-            const star_password = await confirm({
-              message: "Do you want to star this password?",
-            });
-            new_entry = star_password;
-          }
-          console.log(action);
-          if (action === "copy") {
-            clipboardy.writeSync(
-              websites[password][property_map[password_options]]
-            );
-          } else if (action === "edit") {
-            const generate_password = await confirm({
-              message: "Do you want to generate a new password?",
-            });
-            if (generate_password) {
-              let password_length = await text({
-                message: "How long should your new password be?",
-                validate(value) {
-                  if (!isFinite(value)) return "Please input a number!";
-                },
+            let action = "";
+            let new_entry = "";
+            if (password_options != "starred") {
+              action = await select({
+                message: "Choose what to do with this property.",
+                options: [
+                  { value: "copy", label: "Copy Property" },
+                  { value: "edit", label: "Edit Property" },
+                ],
               });
-
-              password_length = Number(password_length);
-              new_entry = generatePassword(password_length);
             } else {
-              new_entry = await text({
-                message: `What should your new ${password_options} be?`,
-                placeholder: websites[password][property_map[password_options]],
-                validate(value) {
-                  if (value.length === 0) return "Please input a value!";
-                },
+              const star_password = await confirm({
+                message: "Do you want to star this password?",
               });
+              new_entry = star_password;
             }
+            if (action === "copy") {
+              clipboardy.writeSync(
+                websites[password][property_map[password_options]]
+              );
+            } else if (action === "edit") {
+              if (password_options === "password") {
+                const generate_password = await confirm({
+                  message: "Do you want to generate a new password?",
+                });
+                if (generate_password) {
+                  let password_length = await text({
+                    message: "How long should your new password be?",
+                    validate(value) {
+                      if (!isFinite(value)) return "Please input a number!";
+                    },
+                  });
+
+                  password_length = Number(password_length);
+                  new_entry = generatePassword(password_length);
+                }
+              } else {
+                new_entry = await text({
+                  message: `What should your new ${password_options} be?`,
+                  placeholder:
+                    websites[password][property_map[password_options]],
+                  validate(value) {
+                    if (value.length === 0) return "Please input a value!";
+                  },
+                });
+              }
+            }
+            user_instance.editPasswords(
+              password,
+              password_options,
+              new_entry,
+              password_objects
+            );
+          } else {
+            console.log(
+              chalk
+                .hex("#dfe311")
+                .bold("\n   You haven't added any passwords yet!\n")
+            );
+            console.log(
+              chalk
+                .hex("#0a6625")
+                .bold('   You can add Passwords with the "pwm add" command!')
+            );
           }
-          user_instance.editPasswords(
-            password,
-            password_options,
-            new_entry,
-            password_objects
-          );
         } else {
           console.log("User not authenticated!");
         }
       } else {
         console.log("User doesn't exist!");
       }
+    },
+  })
+  .command({
+    command: "search",
+    describe:
+      "Search for a specific password in your Password Manager by website",
+    handler: async function () {
+      const website = await text({
+        message: "What website are you searching for?",
+        validate(value) {
+          if (value.length === 0) return "Please input your website name!";
+        },
+      });
     },
   })
   .parse();

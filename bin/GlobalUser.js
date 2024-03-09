@@ -39,7 +39,7 @@ class UserSingleton {
   createUser(username, password, face_data, user_key) {
     this.user = new User(username, password, face_data, true, user_key);
     this.writeUserDataToFile();
-    fs.writeFileSync("passwordData.json", JSON.stringify(""), "utf-8");
+    fs.writeFileSync("passwordData.json", "", "utf-8");
   }
 
   getUser() {
@@ -89,7 +89,7 @@ class UserSingleton {
   }
 
   authenticateUser(password) {
-    return this.user.authenticateUser(password)
+    return this.user.authenticateUser(password);
   }
 
   logInUser() {
@@ -100,7 +100,7 @@ class UserSingleton {
   delete() {
     this.user = null;
     this.writeUserDataToFile();
-    fs.unlinkSync('passwordData.json');
+    fs.unlinkSync("passwordData.json");
   }
 
   addPassword(website, username, password, starred) {

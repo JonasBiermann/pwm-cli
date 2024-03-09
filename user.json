@@ -1,1 +1,1 @@
-{"username":"JonasBiermann","password":"1234","face_data":"","session":true,"storage":{"file_path":"passwordData.json","encryption_key":{"type":"Buffer","data":[63,18,178,55,189,94,113,181,46,23,203,140,73,15,128,68,1,18,22,98,217,222,227,120,203,234,135,203,214,187,134,205]}}}
+{"username":"jonas","password":"1234","face_data":"","session":true,"storage":{"file_path":"passwordData.json","encryption_key":{"type":"Buffer","data":[214,239,38,219,24,33,108,177,154,102,119,11,162,43,48,229,254,155,119,184,4,249,119,193,127,129,10,106,59,129,7,32]}}}

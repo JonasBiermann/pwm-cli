@@ -48,7 +48,6 @@ class Storage {
 
       let decrypted_data = decipher.update(encrypted_data, "hex", "utf-8");
       decrypted_data += decipher.final("utf-8");
-
       return JSON.parse(decrypted_data);
     } catch (e) {
       console.error("Error reading or decrypting data: ", e.message);
@@ -73,7 +72,7 @@ class Storage {
     let passwords = [];
     try {
       let data = fs.readFileSync(this.file_path, "utf-8");
-      if (!JSON.parse(data) === "") {
+      if (data != "") {
         passwords = this.decrypt(data);
       }
     } catch (e) {
