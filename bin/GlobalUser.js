@@ -1,24 +1,5 @@
 import { User } from "./classes/UserClass.js";
-import { createPassword, generatePassword } from "./classes/PasswordClass.js";
-
-// export const GlobalUser = (() => {
-//   let user_instance = null;
-
-//   function createUser(username, password, face_data, user_key) {
-//     if (!user_instance) {
-//       console.log("test");
-//       user_instance = new User(username, password, face_data, user_key);
-//     }
-//     return user_instance;
-//   }
-
-//   function getUser() {
-//     console.log("test", user_instance);
-//     return user_instance;
-//   }
-
-//   return { createUser, getUser };
-// })();
+import { createPassword } from "./classes/PasswordClass.js";
 
 import fs from "fs";
 
@@ -36,8 +17,8 @@ class UserSingleton {
     return UserSingleton.instance;
   }
 
-  createUser(username, password, face_data, user_key) {
-    this.user = new User(username, password, face_data, true, user_key);
+  createUser(username, password, user_key) {
+    this.user = new User(username, password, true, user_key);
     this.writeUserDataToFile();
     fs.writeFileSync("passwordData.json", "", "utf-8");
   }
@@ -65,7 +46,6 @@ class UserSingleton {
         return new User(
           user_data_object.username,
           user_data_object.password,
-          user_data_object.face_data,
           user_data_object.session,
           user_data_object.storage.encryption_key
         );

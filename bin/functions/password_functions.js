@@ -1,4 +1,4 @@
-import { generatePassword } from "./classes/PasswordClass.js";
+import { generatePassword } from "../classes/PasswordClass.js";
 import { text, select, confirm, group, password } from "@clack/prompts";
 import clipboardy from "clipboardy";
 import chalk from "chalk";

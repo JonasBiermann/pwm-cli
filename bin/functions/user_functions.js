@@ -1,6 +1,6 @@
-import UserSingleton from "./GlobalUser.js";
+import UserSingleton from "../GlobalUser.js";
 import crypto from "crypto";
-import { text, select, confirm, group, password } from "@clack/prompts";
+import { text, confirm, group } from "@clack/prompts";
 
 // Function to check if user is authenticated
 export function isAuthenticated(user) {
@@ -66,7 +66,6 @@ export async function createUser() {
   UserSingleton.getInstance().createUser(
     create_user.username,
     create_user.password,
-    "",
     user_key
   );
 }
