@@ -51,8 +51,8 @@ If you need help or want to check the current version use the following commands
 ## Usage
 
 To use a command, run `pwm <command>`. For example:
-`pwm add`
-For more details on each command and its options, run `pwm --help`
+`pwm add`.
+For more details on each command and its options, run `pwm --help`.
 The use of `Ctrl+C` aborts any process in the program.
 
 Currently it is not possible to run the CLI globally on your system. Therefore, you need to always navigate to the `pwm-cli` directory to interact with the CLI.
