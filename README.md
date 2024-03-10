@@ -11,6 +11,7 @@ First, if its not already installed you need to install [NodeJS](https://nodejs.
 To use PWM follow these steps:
 
 1. Clone the repository to your local machine:
+
    `git clone https://github.com/JonasBiermann/pwm-cli.git `
 
 2. Navigate to the project directory (either in Terminal using `cd` or opening in VSCode):
@@ -18,9 +19,11 @@ To use PWM follow these steps:
    `cd pwm-cli`
 
 3. Install the project dependencies:
+
    `npm install -g .`
 
 4. Run PWM:
+
    `pwm`
 
 This CLI requires the following dependencies.
