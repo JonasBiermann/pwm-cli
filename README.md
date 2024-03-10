@@ -43,6 +43,11 @@ PWM supports the following commands:
 - `pwm show-all`: Show a list of stored passwords for websites.
 - `pwm search`: Search for a specific password by website.
 
+If you need help or want to check the current version use the following commands
+
+- `pwm --help`
+- `pwm --version`
+
 ## Usage
 
 To use a command, run `pwm <command>`. For example:
