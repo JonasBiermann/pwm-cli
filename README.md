@@ -13,7 +13,7 @@ To use PWM follow these steps:
 1. Clone the repository to your local machine:
    `git clone https://github.com/JonasBiermann/pwm-cli.git `
 
-2. Navigate to the project directory:
+2. Navigate to the project directory (either in Terminal using `cd` or opening in VSCode):
    `cd pwm-cli`
 
 3. Install the project dependencies:
