@@ -7,15 +7,6 @@ PWM is a command-line password manager tool that allows you to manage your passw
 ### Dependencies
 
 First you need to install [NodeJS](https://nodejs.org/en/download) from the official website.
-This CLI requires the following dependencies.
-
-- @clack
-- chalk
-- clipboardy
-- crypto
-- yargs
-
-If these dependencies are not installed on your machine, run `npm install <dependecy>` in your terminal.
 
 To use PWM follow these steps:
 
@@ -30,6 +21,16 @@ To use PWM follow these steps:
 
 4. Run PWM:
    `pwm`
+
+This CLI requires the following dependencies.
+
+- @clack
+- chalk
+- clipboardy
+- crypto
+- yargs
+
+If these dependencies are not installed on your machine or if you encounter any installation errors, run `npm install <dependecy>` in your terminal.
 
 ## Commands
 
