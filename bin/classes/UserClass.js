@@ -9,28 +9,13 @@ export class User {
   }
 
   authenticateUser(entered_password) {
-    if (this.checkPassword(entered_password)) {
+    if (entered_password === this.password) {
       console.log("User was succesfully authenticated");
       this.session = true;
       return true;
     } else {
       return false;
     }
-  }
-
-  checkPassword(entered_password) {
-    if (entered_password === this.password) {
-      return true;
-    } else {
-      console.log("Entered Password doesn't match user password!");
-      return false;
-      // throw new Error("Entered password doesn't match user password");
-    }
-  }
-
-  logOutUser() {
-    this.session = false;
-    return true;
   }
 
   getSession() {

@@ -53,6 +53,21 @@ export function getWebsites(password_objects) {
   return websites;
 }
 
+export function getStarredWebsites(password_objects) {
+  let passwords = quickSort(Object.values(password_objects));
+  let websites = {};
+  passwords.forEach((password) => {
+    if (password.starred) {
+      websites[password.website] = [
+        password.username,
+        password.password_objects,
+        password.starred,
+      ];
+    }
+  });
+  return websites;
+}
+
 export function getWebsiteOptions(websites) {
   let website_options = [];
   for (let i = 0; i < websites.length; i++) {

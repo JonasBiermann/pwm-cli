@@ -5,34 +5,6 @@ export class Password {
     this.password = password;
     this.starred = starred;
   }
-
-  getPassword() {
-    return this.password;
-  }
-
-  editUsername(new_username) {
-    if (new_username != this.username) {
-      this.username = new_username;
-    } else {
-      throw new Error("Choose a different Username or E-Mail!");
-    }
-  }
-
-  editPassword(new_password) {
-    if (new_password != this.password) {
-      this.password = new_password;
-    } else {
-      throw new Error("Password needs to be different!");
-    }
-  }
-
-  starPassword() {
-    this.starred = !this.starPassword;
-  }
-
-  checkIsStarred() {
-    return this.starred;
-  }
 }
 
 export function createPassword(website, username, password, starred) {
