@@ -6,7 +6,7 @@ PWM is a command-line password manager tool that allows you to manage your passw
 
 ### Dependencies
 
-First you need to install [NodeJS](https://nodejs.org/en/download) from the official website.
+First, if its not already installed you need to install [NodeJS](https://nodejs.org/en/download) from the official website.
 
 To use PWM follow these steps:
 
