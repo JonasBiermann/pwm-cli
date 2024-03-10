@@ -8,9 +8,18 @@ To use PWM follow these steps:
 
 1. Clone the repository to your local machine:
 
-`git clone https://github.com/JonasBiermann/pwm-cli.git ` 2. Navigate to the project directory:
-`cd pwm-cli` 3. Install the project dependencies:
-`npm install` 4. Run PWM:
+`git clone https://github.com/JonasBiermann/pwm-cli.git `
+
+2. Navigate to the project directory:
+
+`cd pwm-cli`
+
+3. Install the project dependencies:
+
+`npm install`
+
+4. Run PWM:
+
 `pwm`
 
 ## Commands
