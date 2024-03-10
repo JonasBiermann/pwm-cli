@@ -1,26 +1,34 @@
-# PWM (Password Manager CLI)
+# PWM (Password Manager CLI) by Jonas Biermann
 
 PWM is a command-line password manager tool that allows you to manage your passwords securely from the terminal without the need to use your mouse!
 
 ## Installation
 
+### Dependencies
+
+This CLI requires the following dependencies.
+
+- @clack
+- chalk
+- clipboardy
+- crypto
+- yargs
+
+If these dependencies are not installed on your machine run `npm install <dependecy>` in your terminal.
+
 To use PWM follow these steps:
 
 1. Clone the repository to your local machine:
-
-`git clone https://github.com/JonasBiermann/pwm-cli.git `
+   `git clone https://github.com/JonasBiermann/pwm-cli.git `
 
 2. Navigate to the project directory:
-
-`cd pwm-cli`
+   `cd pwm-cli`
 
 3. Install the project dependencies:
-
-`npm install`
+   `npm install`
 
 4. Run PWM:
-
-`pwm`
+   `pwm`
 
 ## Commands
 
