@@ -26,8 +26,6 @@ export async function addNewPassword(user_instance) {
         message: "What is your password?",
         validate(value) {
           if (value.length === 0) return "Please enter your Password!";
-          if (value.length < 4)
-            return "Please make your password at least 4 characters long!";
         },
       }),
     starred: () => confirm({ message: "Do you want to star this password?" }),

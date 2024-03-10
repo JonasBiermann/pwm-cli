@@ -84,18 +84,6 @@ yargs(hideBin(process.argv))
     },
   })
   .command({
-    command: "status",
-    description: "Check the User status",
-    handler: function () {
-      const user = checkUser();
-      if (user) {
-        console.log(user);
-      } else {
-        console.log("User doenst exist!");
-      }
-    },
-  })
-  .command({
     command: "delete-user",
     description: "Delete the current User and all Passwords",
     handler: async function () {
