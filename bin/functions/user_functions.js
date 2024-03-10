@@ -1,6 +1,7 @@
 import UserSingleton from "../GlobalUser.js";
 import crypto from "crypto";
 import { text, confirm, group } from "@clack/prompts";
+import { checkUserCancel } from "./util_functions.js";
 
 // Function to check if user is authenticated
 export function isAuthenticated(user) {
@@ -32,6 +33,7 @@ export async function checkUserAuthAttempt(user, user_instance) {
         if (value.length === 0) return "Please enter your Password!";
       },
     });
+    checkUserCancel("User Authentication cancelled.", password);
     if (user && user_instance.authenticateUser(password)) {
       user_instance.logInUser();
       try_again = false;
@@ -39,6 +41,7 @@ export async function checkUserAuthAttempt(user, user_instance) {
       try_again = await confirm({
         message: "Do you want to try again?",
       });
+      checkUserCancel("User Authentication cancelled.", try_again);
     }
   }
 }
@@ -62,6 +65,7 @@ export async function createUser() {
         },
       }),
   });
+  checkUserCancel("User creation cancelled.", create_user);
   let user_key = crypto.randomBytes(32).toString("hex");
   UserSingleton.getInstance().createUser(
     create_user.username,

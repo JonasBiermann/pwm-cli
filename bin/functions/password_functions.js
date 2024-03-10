@@ -1,7 +1,9 @@
-import { generatePassword } from "../classes/PasswordClass.js";
-import { text, select, confirm, group, password } from "@clack/prompts";
 import clipboardy from "clipboardy";
 import chalk from "chalk";
+
+import { generatePassword } from "../classes/PasswordClass.js";
+import { text, select, confirm, group, isCancel, cancel } from "@clack/prompts";
+import { checkUserCancel } from "./util_functions.js";
 
 export async function addNewPassword(user_instance) {
   const new_password = await group({
@@ -30,6 +32,14 @@ export async function addNewPassword(user_instance) {
       }),
     starred: () => confirm({ message: "Do you want to star this password?" }),
   });
+  if (
+    (isCancel(new_password.website) || isCancel(new_password.username),
+    isCancel(new_password.password),
+    isCancel(new_password.starred))
+  ) {
+    cancel("Password was not added!");
+    process.exit(0);
+  }
   user_instance.addPassword(
     new_password.website,
     new_password.username,
@@ -67,7 +77,7 @@ export async function showPasswords(
       },
     ],
   });
-
+  checkUserCancel("Operation cancelled.", password_options);
   if (Object.keys([websites]).length != 0) {
     editPassword(
       property_map,
@@ -102,16 +112,18 @@ export async function editPassword(
 
   if (password_options != "starred") {
     action = await select({
-      message: "Choose waht to do with this property.",
+      message: "Choose what to do with this property.",
       options: [
         { value: "copy", label: "Copy Property" },
         { value: "edit", label: "Edit Property" },
       ],
     });
+    checkUserCancel("Operation cancelled.", action);
   } else {
     const star_password = await confirm({
       message: "Do you want to star this password?",
     });
+    checkUserCancel("Operation cancelled.", action);
     new_entry = star_password;
   }
 
@@ -122,6 +134,7 @@ export async function editPassword(
       const generate_password = await confirm({
         message: "Do you want to generate a new password?",
       });
+      checkUserCancel("Operation cancelled.", generate_password);
       if (generate_password) {
         let password_length = await text({
           message: "How long should your new password be?",
@@ -129,6 +142,7 @@ export async function editPassword(
             if (!isFinite(value)) return "Please input a number!";
           },
         });
+        checkUserCancel("Password generation cancelled..", password_length);
 
         password_length = Number(password_length);
         new_entry = generatePassword(password_length);
@@ -140,6 +154,7 @@ export async function editPassword(
             if (value.length === 0) return "Please input a value!";
           },
         });
+        checkUserCancel("Operation cancelled.", new_entry);
       }
     } else {
       new_entry = await text({
@@ -149,6 +164,7 @@ export async function editPassword(
           if (value.length === 0) return "Please input a value!";
         },
       });
+      checkUserCancel("Operation cancelled.", new_entry);
     }
 
     user_instance.editPasswords(

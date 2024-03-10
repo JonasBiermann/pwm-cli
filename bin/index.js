@@ -4,7 +4,15 @@ import UserSingleton from "./GlobalUser.js";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import { generatePassword } from "./classes/PasswordClass.js";
-import { intro, text, select, confirm, group, password } from "@clack/prompts";
+import {
+  intro,
+  text,
+  select,
+  confirm,
+  group,
+  cancel,
+  isCancel,
+} from "@clack/prompts";
 import clipboardy from "clipboardy";
 import chalk from "chalk";
 
@@ -18,7 +26,11 @@ import {
   addNewPassword,
   showPasswords,
 } from "./functions/password_functions.js";
-import { getWebsites, getWebsiteOptions } from "./functions/util_functions.js";
+import {
+  getWebsites,
+  getWebsiteOptions,
+  checkUserCancel,
+} from "./functions/util_functions.js";
 
 intro(
   `${chalk.hex("#171717")(
@@ -94,6 +106,7 @@ yargs(hideBin(process.argv))
           const delete_user_check = await confirm({
             message: "Do you want to delete the currently active user?",
           });
+          checkUserCancel("User Deletion cancelled.", delete_user_check);
           if (delete_user_check) {
             user_instance.delete();
           }
@@ -143,6 +156,7 @@ yargs(hideBin(process.argv))
                   return "Your Passwords length must be smaller than 32 characters!";
               },
             });
+            checkUserCancel("Password Generation cancelled.", password_length);
 
             password_length = Number(password_length);
             let secure_password = generatePassword(password_length);
@@ -156,6 +170,7 @@ yargs(hideBin(process.argv))
                 { value: "copy", label: "Copy" },
               ],
             });
+            checkUserCancel("Operation cancelled.", save_password_check);
 
             if (save_password_check === "save") {
               const generated_password_group = await group({
@@ -178,6 +193,14 @@ yargs(hideBin(process.argv))
                 starred: () =>
                   confirm({ message: "Do you want to star this password?" }),
               });
+              if (
+                isCancel(generated_password_group.website) ||
+                isCancel(generated_password_group.username) ||
+                isCancel(generated_password_group.starred)
+              ) {
+                cancel("Operation cancelled");
+                process.exit(0);
+              }
               user_instance.addPassword(
                 generated_password_group.website,
                 generated_password_group.username,
@@ -218,6 +241,7 @@ yargs(hideBin(process.argv))
               message: "What password do you want to access?",
               options: getWebsiteOptions(Object.keys(websites)),
             });
+            checkUserCancel("Operation cancelled.", password);
             const password_options = await select({
               message: "Choose Password property to edit/copy.",
               options: [
@@ -241,6 +265,7 @@ yargs(hideBin(process.argv))
                 },
               ],
             });
+            checkUserCancel("Operation cancelled.", password_options);
             let action = "";
             let new_entry = "";
             if (password_options != "starred") {
@@ -251,6 +276,7 @@ yargs(hideBin(process.argv))
                   { value: "edit", label: "Edit Property" },
                 ],
               });
+              checkUserCancel("Operation cancelled.", action);
             } else {
               const star_password = await confirm({
                 message: "Do you want to star this password?",
@@ -266,6 +292,7 @@ yargs(hideBin(process.argv))
                 const generate_password = await confirm({
                   message: "Do you want to generate a new password?",
                 });
+                checkUserCancel("Operation cancelled.", generate_password);
                 if (generate_password) {
                   let password_length = await text({
                     message: "How long should your new password be?",
@@ -273,6 +300,7 @@ yargs(hideBin(process.argv))
                       if (!isFinite(value)) return "Please input a number!";
                     },
                   });
+                  checkUserCancel("Operation cancelled.", password_length);
 
                   password_length = Number(password_length);
                   new_entry = generatePassword(password_length);
@@ -295,6 +323,7 @@ yargs(hideBin(process.argv))
                     if (value.length === 0) return "Please input a value!";
                   },
                 });
+                checkUserCancel("Operation canelled.", new_entry);
               }
               user_instance.editPasswords(
                 password,
@@ -343,6 +372,7 @@ yargs(hideBin(process.argv))
                 return "Password for Website doesn't exist!";
             },
           });
+          checkUserCancel("Website search was cancelled.", website);
           showPasswords(websites, website, password_objects, user_instance);
         } else {
           console.log("User is not authenticated!");

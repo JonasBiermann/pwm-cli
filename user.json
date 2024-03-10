@@ -1,1 +1,1 @@
-{"username":"JOnas","password":"1234","session":true,"storage":{"file_path":"passwordData.json","encryption_key":{"type":"Buffer","data":[143,165,119,222,15,109,126,160,32,71,126,155,156,96,10,94,156,120,231,105,224,25,9,59,60,159,246,68,131,38,119,181]}}}
+{"username":"jonas","password":"1234","session":true,"storage":{"file_path":"passwordData.json","encryption_key":{"type":"Buffer","data":[155,55,69,90,242,54,8,150,19,204,125,20,198,57,74,119,134,149,135,56,46,62,44,31,131,189,118,240,96,119,22,249]}}}

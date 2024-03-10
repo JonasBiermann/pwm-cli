@@ -1,3 +1,12 @@
+import { isCancel, cancel } from "@clack/prompts";
+
+export function checkUserCancel(message, value) {
+  if (isCancel(value)) {
+    cancel(`${message}`);
+    process.exit(0);
+  }
+}
+
 export function compareStrings(string1, pivot) {
   let range = Math.min(string1.length, pivot.length);
   for (let i = 0; i < range; i++) {
