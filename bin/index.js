@@ -141,7 +141,7 @@ yargs(hideBin(process.argv))
               message: "How long should your new password be?",
               validate(value) {
                 if (!isFinite(value)) return "Please input a number!";
-                if (Number(value) > 32)
+                if (Number(value) > 32 && Number(value) != 42)
                   return "Your Passwords length must be smaller than 32 characters!";
               },
             });
